@@ -1,9 +1,11 @@
 class NotFound(Exception):
-    pass
+    def __init__(self, template='404.html'):
+        self.template = template
 
 
 class Forbidden(Exception):
-    pass
+    def __init__(self, template='403.html'):
+        self.template = template
 
 
 class NotModified(Exception):

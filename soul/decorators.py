@@ -18,23 +18,25 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
             if "data" in inspect.getargspec(function).args:
                 if request.META['CONTENT_TYPE'].startswith('application/json'):
                     request_data = json.loads(request.body)
-                elif request.META['CONTENT_TYPE'].startswith('application/x-www-form-urlencoded'):
+                elif request.META['CONTENT_TYPE'].startswith('application/x-www-form-urlencoded') or request.META['CONTENT_TYPE'].startswith('text/plain'):
                     if request.method == "GET":
                         request_data = request.GET
                     elif request.method == "POST":
                         request_data = request.POST
                     else:
-                        raise ValueError("Request method: %s not allowed for CONTENT_TYPE: %s" % (request.method, request.META['CONTENT_TYPE']))
+                        raise ValueError("Request method: %s not allowed for CONTENT_TYPE: %s" % (
+                            request.method,
+                            request.META['CONTENT_TYPE']))
                 else:
                     raise ValueError("Unknown content type: '%s'" % request.META['CONTENT_TYPE'])
                 kwargs['data'] = request_data
 
             try:
                 out = function(self, request, *args, **kwargs)
-            except exceptions.NotFound:
-                return HttpResponseNotFound()
-            except exceptions.Forbidden:
-                return HttpResponseForbidden()
+            except exceptions.NotFound as notfound:
+                return HttpResponseNotFound(loader.get_template(notfound.template).render(RequestContext(request)))
+            except exceptions.Forbidden as forbidden:
+                return HttpResponseForbidden(loader.get_template(forbidden.template).render(RequestContext(request)))
             except exceptions.NotModified:
                 return HttpResponseNotModified()
             except exceptions.Redirect as redirect:
@@ -42,7 +44,7 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
 
             if template_path == "json" or ajax_allowed and request.is_ajax():
                 if type(out) in [dict, list]:
-                    out_dict = json.dumps(out)
+                    out_dict = out
                 elif type(out) == QuerySet:
                     out_dict = map(lambda model: model.to_dict(), out)
                 elif hasattr(out, 'to_dict'):
@@ -51,7 +53,7 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                     raise ValueError("Unknown response type %s" % type(out))
 
                 return HttpResponse(json.dumps(out_dict),
-                                    mimetype="application/json",
+                                    content_type="application/json",
                                     status=200)
 
             else:
