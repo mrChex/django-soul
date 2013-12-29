@@ -30,7 +30,7 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                 kwargs['data'] = request_data
 
             try:
-                out = function(*args, **kwargs)
+                out = function(self, request, *args, **kwargs)
             except exceptions.NotFound:
                 return HttpResponseNotFound()
             except exceptions.Forbidden:
