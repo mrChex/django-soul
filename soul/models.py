@@ -2,6 +2,7 @@ from datetime import datetime, date
 from time import mktime
 from types import FunctionType
 from django.db.models.query import QuerySet
+from decimal import Decimal
 
 
 class SerializeModel():
@@ -18,6 +19,8 @@ class SerializeModel():
                 value = field
             elif type(field) == datetime or type(field) == date:
                 value = mktime(field.timetuple())
+            elif type(field) == Decimal:
+                value = float(field)
             elif type(field) == FunctionType:
                 value = field()
             elif type(field) == QuerySet:
