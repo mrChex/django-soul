@@ -2,6 +2,7 @@
 from django.views.generic import View
 from soul.decorators import render_to
 from soul.exceptions import NotFound, NotModified, Forbidden, Redirect
+from test import models
 
 
 class Json(View):
@@ -32,3 +33,26 @@ class Statuses(View):
                     "403": "Forbidden",
                     "404": "NotFound"
                 }}
+
+
+class Models(View):
+
+    @render_to('json')
+    def get(self, request, data):
+        return {
+            "models": models.Test.objects.all(),
+            "test": {
+                "asd": models.Test.objects.all()
+            }
+        }
+
+
+class ModelsFull(View):
+
+    @render_to('json')
+    def get(self, request, data):
+
+        for i in range(10):
+            models.Test(test_field="asd").save()
+
+        return {"status": "saved"}

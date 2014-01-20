@@ -43,16 +43,15 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                 return HttpResponseRedirect(redirect.path)
 
             if template_path == "json" or ajax_allowed and request.is_ajax():
-                if type(out) in [dict, list]:
-                    out_dict = out
-                elif type(out) == QuerySet:
-                    out_dict = map(lambda model: model.to_dict(), out)
-                elif hasattr(out, 'to_dict'):
-                    out_dict = out.to_dict()
-                else:
-                    raise ValueError("Unknown response type %s" % type(out))
+                def serialize_object(_obj):
+                    if type(_obj) == QuerySet:
+                        return map(lambda model: model.to_dict(), _obj)
+                    elif hasattr(out, 'to_dict'):
+                        return out.to_dict()
+                    else:
+                        raise ValueError("Unknown response type %s" % type(_obj))
 
-                return HttpResponse(json.dumps(out_dict),
+                return HttpResponse(json.dumps(out, default=serialize_object),
                                     content_type="application/json",
                                     status=200)
 
