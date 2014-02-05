@@ -15,3 +15,7 @@ class NotModified(Exception):
 class Redirect(Exception):
     def __init__(self, path):
         self.path = path
+
+
+class BadRequest(Exception):
+    pass

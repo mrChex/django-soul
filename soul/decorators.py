@@ -5,7 +5,8 @@ from django.http import HttpResponse,\
     HttpResponseRedirect,\
     HttpResponseForbidden, \
     HttpResponseNotFound, \
-    HttpResponseNotModified
+    HttpResponseNotModified, \
+    HttpResponseBadRequest
 from django.db.models.query import QuerySet
 from django.template import RequestContext, loader
 import exceptions
@@ -41,6 +42,8 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                 return HttpResponseNotModified()
             except exceptions.Redirect as redirect:
                 return HttpResponseRedirect(redirect.path)
+            except exceptions.BadRequest:
+                return HttpResponseBadRequest()
 
             if template_path == "json" or ajax_allowed and request.is_ajax():
                 def serialize_object(_obj):
