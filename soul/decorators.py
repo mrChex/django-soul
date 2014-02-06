@@ -48,7 +48,8 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
             if template_path == "json" or ajax_allowed and request.is_ajax():
                 def serialize_object(_obj):
                     if type(_obj) == QuerySet:
-                        return map(lambda model: model.to_dict(), _obj)
+                        ignore_fields = _obj.ignore_fields if hasattr(_obj, 'ignore_fields') else False
+                        return map(lambda model: model.to_dict(ignore_fields), _obj)
                     elif hasattr(out, 'to_dict'):
                         return out.to_dict()
                     else:

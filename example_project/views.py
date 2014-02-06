@@ -39,8 +39,10 @@ class Models(View):
 
     @render_to('json')
     def get(self, request, data):
+        models_queryset = models.Test.objects.all()
+        models_queryset.__setattr__('ignore_fields', ['test_field'])
         return {
-            "models": models.Test.objects.all(),
+            "models": models_queryset,
             "test": {
                 "asd": models.Test.objects.all()
             }

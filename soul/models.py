@@ -8,9 +8,11 @@ from decimal import Decimal
 class SerializeModel():
     to_dict_fields = []
 
-    def to_dict(self):
+    def to_dict(self, ignore_fields):
         to_return = {}
         for field_name in self.to_dict_fields:
+            if ignore_fields and field_name in ignore_fields:
+                continue
             field = getattr(self, field_name)
 
             if str(type(field)) == "<class 'django.db.models.fields.related.ManyRelatedManager'>":
