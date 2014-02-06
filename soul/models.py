@@ -8,7 +8,7 @@ from decimal import Decimal
 class SerializeModel():
     to_dict_fields = []
 
-    def to_dict(self, ignore_fields):
+    def to_dict(self, ignore_fields=False):
         to_return = {}
         for field_name in self.to_dict_fields:
             if ignore_fields and field_name in ignore_fields:
