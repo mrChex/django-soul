@@ -50,6 +50,8 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                     if type(_obj) == QuerySet:
                         ignore_fields = _obj.ignore_fields if hasattr(_obj, 'ignore_fields') else False
                         return map(lambda model: model.to_dict(ignore_fields), _obj)
+                    elif str(type(_obj)) == "<class 'decimal.Decimal'>":
+                        return float(_obj)
                     elif hasattr(out, 'to_dict'):
                         return out.to_dict()
                     else:
