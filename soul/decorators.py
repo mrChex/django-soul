@@ -52,8 +52,8 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                         return map(lambda model: model.to_dict(ignore_fields), _obj)
                     elif str(type(_obj)) == "<class 'decimal.Decimal'>":
                         return float(_obj)
-                    elif hasattr(out, 'to_dict'):
-                        return out.to_dict()
+                    elif hasattr(_obj, 'to_dict'):
+                        return _obj.to_dict()
                     else:
                         raise ValueError("Unknown response type %s" % type(_obj))
 
