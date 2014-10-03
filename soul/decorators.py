@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import inspect
+import datetime
+import decimal
 from django.http import HttpResponse,\
     HttpResponseRedirect,\
     HttpResponseForbidden, \
@@ -15,7 +17,6 @@ import exceptions
 def render_to(template_path, ajax_allowed=True, request_to_output=True):
     def renderer(function):
         def wrapper(self, request, *args, **kwargs):
-
             if "data" in inspect.getargspec(function).args:
                 if request.META['CONTENT_TYPE'].startswith('application/json'):
                     request_data = json.loads(request.body)
@@ -50,8 +51,10 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                     if type(_obj) == QuerySet:
                         ignore_fields = _obj.ignore_fields if hasattr(_obj, 'ignore_fields') else False
                         return map(lambda model: model.to_dict(ignore_fields), _obj)
-                    elif str(type(_obj)) == "<class 'decimal.Decimal'>":
+                    elif isinstance(_obj, decimal.Decimal):
                         return float(_obj)
+                    elif isinstance(_obj, datetime.datetime):
+                        return _obj.strftime('%d %m %Y %H:%M:%S')
                     elif hasattr(_obj, 'to_dict'):
                         return _obj.to_dict()
                     else:
