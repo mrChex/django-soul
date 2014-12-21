@@ -10,6 +10,7 @@ from django.http import HttpResponse,\
     HttpResponseNotModified, \
     HttpResponseBadRequest
 from django.db.models.query import QuerySet
+from django.db.models.fields.files import FieldFile
 from django.template import RequestContext, loader
 import exceptions
 
@@ -55,6 +56,10 @@ def render_to(template_path, ajax_allowed=True, request_to_output=True):
                         return float(_obj)
                     elif isinstance(_obj, datetime.datetime):
                         return _obj.strftime('%d %m %Y %H:%M:%S')
+                    elif hasattr(_obj, '__module__') and str(_obj.__module__).split('.')[1] == 'models':
+                        return _obj.to_json()
+                    elif isinstance(_obj, FieldFile):
+                        return _obj.url if _obj else None
                     elif hasattr(_obj, 'to_dict'):
                         return _obj.to_dict()
                     else:
