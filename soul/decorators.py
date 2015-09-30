@@ -12,7 +12,7 @@ from django.http import HttpResponse,\
 from django.db.models.query import QuerySet
 from django.db.models.fields.files import FieldFile
 from django.template import RequestContext, loader
-import exceptions
+from soul import exceptions
 
 
 def render_to(template_path, ajax_allowed=True, request_to_output=True):
